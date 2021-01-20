@@ -21,7 +21,9 @@ class Card extends \mtgsdk\Card implements JsonSerializable
     }
 
     /**
-     * @return string
+     * Gets the HTML representation of this card.
+     *
+     * @return string The HTML representation of this card.
      */
     public function toHTML(): string
     {
@@ -64,13 +66,19 @@ class Card extends \mtgsdk\Card implements JsonSerializable
     }
 
     /**
-     * @param string $inputString
-     * @return string
+     * Converts text to mana symbols.
+     *
+     * Converts any text from {#} to it's html tag.
+     *
+     * @param string $inputString the string to replace mana symbols in.
+     * @return string The string now containing html mana symbols.
      */
     public static function convertManaSymbolsToHtml(string $inputString): string
     {
         return preg_replace_callback("|\{([A-z0-9]*)\}|", function($matches) {
+            // If it's 't', make it 'tap', and lowercase the result either way.
             $match = $matches[1] == 't' ? 'tap' : strtolower($matches[1]);
+            // return the HTML tag for this symbol.
             return "<i class='mi mi-$match mi-mana'></i>";
         }, $inputString);
     }

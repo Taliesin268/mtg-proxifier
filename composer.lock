@@ -1,0 +1,59 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "cc7dacf2769d66533324b249dc83b10e",
+    "packages": [
+        {
+            "name": "mtgsdk/mtgsdk",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/MagicTheGathering/mtg-sdk-php.git",
+                "reference": "73ba7e00a803b2b7d7ce6bdc13c98c30a355eb57"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/MagicTheGathering/mtg-sdk-php/zipball/73ba7e00a803b2b7d7ce6bdc13c98c30a355eb57",
+                "reference": "73ba7e00a803b2b7d7ce6bdc13c98c30a355eb57",
+                "shasum": ""
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^1.12",
+                "php-vcr/php-vcr": "^1.2",
+                "phpunit/phpunit": "^5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "mtgsdk\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Guido Contreras Woda",
+                    "email": "guiwoda@gmail.com"
+                }
+            ],
+            "description": "Magic: The Gathering SDK for php",
+            "time": "2018-10-12T15:26:21+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "mtgsdk/mtgsdk": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
+}

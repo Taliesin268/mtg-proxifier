@@ -37,7 +37,7 @@ class CardList implements ArrayAccess, Iterator
         // Trim the spaces from the line
         $line = trim($line);
 
-        $match = preg_match('/^([0-9]*) (\[([A-Z0-9]{1,3})#?([A-Z0-9]{1,4})\])? (.*)$/', $line, $matches);
+        $match = preg_match('/^([0-9]* )?(\[([A-Z0-9]{1,3})#?([A-Z0-9]{1,4})\] )?(.*)$/', $line, $matches);
         if (!$match) {
             return null;
         }
@@ -136,6 +136,6 @@ foreach ($cardlist as $i => $card) {
     }
     echo "</ul></li>";
     echo "<li>Cost: $card->manaCost</li>";
-    echo "<li>Type: $card->supertypes - $card->subtypes</li>";
+    echo "<li>Type: $card->type</li>";
     echo "</ul>";
 }

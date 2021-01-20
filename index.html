@@ -6,7 +6,7 @@
     <script>
         window.onload = function onLoad() {
             document.getElementsByTagName('form')[0].onsubmit = function(){
-                let text = document.getElementById('cardlist').value;
+                let text = document.getElementById('cardlisttext').value;
                 document.getElementById('cardlist').value = JSON.stringify(text.split("\n"));
             };
         }
@@ -16,7 +16,8 @@
     <h1>MTG Low-Ink Proxifier</h1>
     <p>Please enter your card list:</p>
     <form action="proxifier.php" method="post">
-        <textarea name="cardlist" id="cardlist" cols="50" rows="20"></textarea>
+        <textarea name="cardlisttext" id="cardlisttext" cols="50" rows="20"></textarea>
+        <input type="hidden" name="cardlist" id="cardlist">
         <input type="submit">
     </form>
 </body>

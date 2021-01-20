@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cc7dacf2769d66533324b249dc83b10e",
+    "content-hash": "e9b1ce8ebc6a717dfc8655118fc2fb1e",
     "packages": [
         {
             "name": "mtgsdk/mtgsdk",
@@ -53,7 +53,9 @@
     },
     "prefer-stable": false,
     "prefer-lowest": false,
-    "platform": [],
+    "platform": {
+        "ext-json": "*"
+    },
     "platform-dev": [],
     "plugin-api-version": "1.1.0"
 }

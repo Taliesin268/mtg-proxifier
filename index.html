@@ -3,11 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>MTG Low-Ink Proxifier</title>
+    <script>
+        window.onload = function onLoad() {
+            document.getElementsByTagName('form')[0].onsubmit = function(){
+                let text = document.getElementById('cardlist').value;
+                document.getElementById('cardlist').value = JSON.stringify(text.split("\n"));
+            };
+        }
+    </script>
 </head>
 <body>
     <h1>MTG Low-Ink Proxifier</h1>
     <p>Please enter your card list:</p>
-    <form action="make_proxies.php" method="post">
+    <form action="proxifier.php" method="post">
         <textarea name="cardlist" id="cardlist" cols="50" rows="20"></textarea>
         <input type="submit">
     </form>

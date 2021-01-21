@@ -8,6 +8,7 @@
     <meta name="description" content="">
     <link href="css/magic-font.css" rel="stylesheet">
     <link href="css/card.css" rel="stylesheet">
+    <script src="js/fittext.js"></script>
 </head>
 <body>
 <?php

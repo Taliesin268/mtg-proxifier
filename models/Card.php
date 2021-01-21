@@ -32,31 +32,34 @@ class Card extends \mtgsdk\Card implements JsonSerializable
 
         // Init the footer.
         $footerHtml = '';
+        $extraTextClasses = '';
 
         // If it's a creature, add power & toughness.
         if(strpos($this->type, 'Creature') !== false) {
-            $footerHtml = "<div class='power-block'>$this->power / $this->toughness</div>";
+            $footerHtml = "<div class='card-footer'><div class='power-block'>$this->power / $this->toughness</div></div>";
+            $extraTextClasses = 'has-footer';
         }
 
         // If it's a planeswalker, add loyalty.
         if(strpos($this->type, 'Planeswalker') !== false) {
-            $footerHtml = "<div class='power-block'>$this->loyalty</div>";
+            $footerHtml = "<div class='card-footer'><div class='power-block'>$this->loyalty</div></div>";
+            $extraTextClasses = 'has-footer';
         }
+
+        $htmlText = nl2br($this->text);
 
         // Write the rest of the card.
         $html = "
             <div class='card'>
                 <div class='card-content'>
                     <div class='card-header'>
-                        <div class='card-name'>$this->name</div>
+                        <div class='card-name auto-resize'>$this->name</div>
                         <div class='mana-cost'>$this->manaCost</div>
                     </div>
                     <div class='card-image'></div>
-                    <div class='card-type'>$this->type</div>
-                    <div class='card-text'>$this->text</div>
-                    <div class='card-footer'>
-                        $footerHtml
-                    </div>
+                    <div class='card-type auto-resize'>$this->type</div>
+                    <div class='card-text auto-resize $extraTextClasses'>$htmlText</div>
+                    $footerHtml
                 </div>
             </div>
         ";

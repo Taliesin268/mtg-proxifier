@@ -5,8 +5,6 @@ function calculateIntendedFontSize(container) {
     fontSize = parseInt(fontSize);
     intendedHeight = parseInt(intendedHeight);
 
-    console.log('The Intended Height is: ' + intendedHeight)
-
     // Make the height automatic
     container.style.height = 'auto';
 
@@ -14,8 +12,6 @@ function calculateIntendedFontSize(container) {
     while(fontSize > 0) {
         let currentHeight = window.getComputedStyle(container).getPropertyValue('height');
         currentHeight = parseInt(currentHeight);
-        console.log('-> New FontSize: ' + fontSize);
-        console.log('-> New Height: ' + currentHeight);
         if(currentHeight <= intendedHeight) {
             break;
         } else {
@@ -23,7 +19,6 @@ function calculateIntendedFontSize(container) {
             container.style.fontSize = fontSize + 'px';
         }
     }
-    console.log('=> Determined Size: ' + fontSize);
 
     container.style.height = intendedHeight + 'px';
 

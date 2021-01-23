@@ -15,9 +15,12 @@ require_once './vendor/autoload.php';
  *
  * @property-read string $color The name of this card's color.
  * @property-read string $htmlText The text of this card with newlines replaced with '<br /> <br />'.
+ * @property-read string $imageIcon HTML image for this card.
  */
 class Card extends \mtgsdk\Card implements JsonSerializable
 {
+    const VALID_CARD_TYPES = ['Artifact', 'Creature', 'Enchantment', 'Instant', 'Land', 'Planeswalker', 'Sorcery'];
+
     /**
      * Magic Get Methods.
      *
@@ -49,6 +52,8 @@ class Card extends \mtgsdk\Card implements JsonSerializable
             // Gets the HTML version of this card's text.
             case 'htmlText':
                 return str_replace('<br />', '<br /><br />', nl2br($this->text));
+            case 'imageIcon':
+                return $this->getImageIcon();
             // If the property isn't defined here, get it from the parent.
             default:
                 return parent::__get($name);
@@ -86,7 +91,7 @@ class Card extends \mtgsdk\Card implements JsonSerializable
                         <div class='card-name auto-resize'>$this->name</div>
                         <div class='mana-cost'>$this->manaCost</div>
                     </div>
-                    <div class='card-image'></div>
+                    <div class='card-image'>$this->imageIcon</div>
                     <div class='card-type auto-resize'>$this->type</div>
                     <div class='card-text auto-resize $extraTextClasses'>$this->htmlText</div>
                     $footerHtml
@@ -155,6 +160,51 @@ class Card extends \mtgsdk\Card implements JsonSerializable
         // return the HTML tag for this symbol.
         return "<i class='mi mi-$manaSymbol'></i>";
 
+    }
+
+    /**
+     * Gets an icon to use for this card's image.
+     *
+     * @return string HTML representing this image's icon.
+     */
+    public function getImageIcon(): string
+    {
+        // Remove the 'Tribal' type.
+        $types = array_intersect($this->types, self::VALID_CARD_TYPES);
+
+        if(count($types) == 1) {
+            // If there's only 1 type, use that icon
+            return self::getSingleImageIcon($types[0]);
+        } else if (count($types) == 2) {
+            // If there's more than 1 type, use 2 icons split.
+            return self::getSingleImageIcon($types[0], 'split') . self::getSingleImageIcon($types[1], 'split');
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * Gets the icon for a particular type.
+     *
+     * @param string $type the type to get the icon for.
+     * @param string $extraClass any extra classes to apply to the icon.
+     * @return string the HTML for this icon.
+     */
+    private static function getSingleImageIcon(string $type, string $extraClass = ''): string
+    {
+        switch ($type) {
+            case 'Artifact':
+            case 'Creature':
+            case 'Enchantment':
+            case 'Instant':
+            case 'Land':
+            case 'Planeswalker':
+            case 'Sorcery':
+                $imageName = strtolower($type);
+                return "<div class='image-icon $extraClass'><img src='svg/$imageName.svg' /></div>";
+            default:
+                return '';
+        }
     }
 
     /**

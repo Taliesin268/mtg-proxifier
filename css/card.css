@@ -1,6 +1,7 @@
 body {
     display: flex;
     flex-flow: wrap;
+    margin: 0;
 }
 
 /* BASE CARD LAYOUT */
@@ -9,7 +10,6 @@ body {
     width: 63mm;
     height: 88mm;
     border: 1px solid lightgrey;
-    margin: 2px;
     padding: 2mm;
     box-sizing: border-box;
     font-size: 14px;
@@ -27,6 +27,7 @@ body {
     height: 100%;
     background-color: white;
     border: 1px solid lightgrey;
+    box-sizing: border-box;
 }
 
 .card-image {

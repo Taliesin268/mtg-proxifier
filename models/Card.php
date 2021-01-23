@@ -3,6 +3,7 @@
 namespace Proxifier;
 
 use JsonSerializable;
+use UnexpectedValueException;
 
 require_once './vendor/autoload.php';
 
@@ -19,6 +20,7 @@ class Card extends \mtgsdk\Card implements JsonSerializable
 {
     /**
      * Magic Get Methods.
+     *
      * @param $name string The parameter name to get.
      * @return mixed|string The parameter value.
      *
@@ -27,17 +29,30 @@ class Card extends \mtgsdk\Card implements JsonSerializable
     public function __get($name)
     {
         switch ($name) {
+            // Make mana cost blank if the card does not have one.
             case 'manaCost':
-                return parent::__get('manaCost') ?? '';
+                try {
+                    return parent::__get('manaCost');
+                } catch (UnexpectedValueException $e) {
+                    return '';
+                }
+            // Make text blank if the card has doesn't have any.
             case 'text':
-                return parent::__get('text') ?? '';
+                try {
+                    return parent::__get('text');
+                } catch (UnexpectedValueException $e) {
+                    return '';
+                }
+            // Defines 'Color' as the textual version of a card's color.
             case 'color':
                 return $this->getColorString();
+            // Gets the HTML version of this card's text.
             case 'htmlText':
                 return str_replace('<br />', '<br /><br />', nl2br($this->text));
+            // If the property isn't defined here, get it from the parent.
+            default:
+                return parent::__get($name);
         }
-
-        return parent::__get($name);
     }
 
     /**
@@ -95,12 +110,16 @@ class Card extends \mtgsdk\Card implements JsonSerializable
     {
         return preg_replace_callback("|\{(([A-z0-9]+)(\/([A-z0-9]+))?)\}|", function ($matches) {
             if (empty($matches[4])) {
+                // If there is no second mana symbol, then just return this mana symbol.
                 return self::convertIndividualManaSymbolToHtml($matches[2]);
             } else if ($matches[4] == 'P') {
-                return self::convertIndividualManaSymbolToHtml($matches[2],true,true);
+                // If the second symbol is phyrexian, print the phyrexian version of the first symbol.
+                return self::convertIndividualManaSymbolToHtml($matches[2], true, true);
             } else if ($matches[2] == 'P') {
-                return self::convertIndividualManaSymbolToHtml($matches[4],true,true);
+                // If the first symbol is phyrexian, print the phyrexian version of the second symbol.
+                return self::convertIndividualManaSymbolToHtml($matches[4], true, true);
             } else {
+                // If there are 2 mana symbols, and neither are phyrexian, make them a split symbol.
                 return '<div class="mi-split">'
                     . self::convertIndividualManaSymbolToHtml($matches[2], true)
                     . self::convertIndividualManaSymbolToHtml($matches[4], true)
@@ -109,13 +128,21 @@ class Card extends \mtgsdk\Card implements JsonSerializable
         }, $inputString);
     }
 
+    /**
+     * Creates the HTML from a single mana symbol.
+     *
+     * @param string $manaSymbol The mana symbol to generate HTML for.
+     * @param bool $split Whether this is for a split card or not.
+     * @param bool $phyrexian Whether this is a phyrexian mana (if it is, $split must be true too).
+     * @return string The HTML version of the mana symbol.
+     */
     public static function convertIndividualManaSymbolToHtml(string $manaSymbol, bool $split = false, bool $phyrexian = false): string
     {
         // Minimise the mana symbol (for use in html).
         $manaSymbol = strtolower($manaSymbol);
 
         // Convert 'q' into 'untap'.
-        $manaSymbol = $manaSymbol == 'q' ? 'untap' :$manaSymbol;
+        $manaSymbol = $manaSymbol == 'q' ? 'untap' : $manaSymbol;
 
         // If it's for a split mana symbol, add 'mi-mana'.
         if (!$split) {
@@ -159,11 +186,16 @@ class Card extends \mtgsdk\Card implements JsonSerializable
     }
 
     /**
-     * @param $colorArray array an array of 2 colors.
+     * Get's the guild name of this card.
+     *
      * @return string the house name, or '' if invalid colors provided.
      */
-    private function getTwoHouseColorName($colorArray): string
+    private function getTwoHouseColorName(): string
     {
+        if (count($this->colors) != 2) {
+            return '';
+        }
+
         // Go through the Black colors.
         if (in_array('Black', $this->colors)) {
             if (in_array('Blue', $this->colors)) {

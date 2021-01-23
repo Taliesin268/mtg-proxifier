@@ -3,6 +3,8 @@ body {
     flex-flow: wrap;
 }
 
+/* BASE CARD LAYOUT */
+
 .card {
     width: 63mm;
     height: 88mm;
@@ -16,36 +18,37 @@ body {
 .card-header {
     display: flex;
     justify-content: space-between;
-    border: 1px solid lightgrey;
+    border-bottom: 1px solid lightgrey;
     padding: 3px 4px 0px 4px;
     margin-bottom: 1px;
 }
 
 .card-content {
     height: 100%;
+    background-color: white;
+    border: 1px solid lightgrey;
 }
 
 .card-image {
     height: 40%;
-    border: 1px solid lightgrey;
-    margin-bottomgg: 1px;
+    margin-bottom: 1px;
 }
 
 .card-type {
-    border: 1px solid lightgrey;
+    border-top: 1px solid lightgrey;
+    border-bottom: 1px solid lightgrey;
     padding: 2px 4px;
     margin-bottom: 1px;
     font-size: 12px;
 }
 
 .card-text {
-    border: 1px solid lightgrey;
     padding: 2px 4px;
     margin-bottom: 1px;
-    height: 134px;
+    height: 140px;
 }
 .card-text.has-footer {
-    height: 95px;
+    height: 105px;
 }
 
 .card-footer {
@@ -53,7 +56,7 @@ body {
     padding: 0px 2px 0px 0;
     display: flex;
     justify-content: flex-end;
-    border: 1px solid lightgrey;
+    border-top: 1px solid lightgrey;
 }
 
 .power-block {
@@ -61,3 +64,70 @@ body {
     margin: auto 1px;
     padding: 5px;
 }
+
+/* COLORS */
+.card.multicolored {
+    background-color: #eeead8;
+}
+
+.card.black {
+    background-color: #bdbdbd;
+}
+
+.card.blue {
+    background-color: #e5edf0;
+}
+
+.card.green {
+    background-color: #e5f0e7;
+}
+
+.card.red {
+    background-color: #efe1e1;
+}
+
+.card.colorless {
+    background-color: #f0f0f0;
+}
+
+.card.azorius {
+    background-image: linear-gradient(to right,white,#e5edf0);
+}
+
+.card.orzhov {
+    background-image: linear-gradient(to right,white,#bdbdbd);
+}
+
+.card.dimir {
+    background-image: linear-gradient(to right,#e5edf0,#bdbdbd);
+}
+
+.card.izzet {
+    background-image: linear-gradient(to right,#e5edf0,#efe1e1);
+}
+
+.card.rakdos {
+    background-image: linear-gradient(to right,#bdbdbd,#efe1e1);
+}
+
+.card.golgari {
+    background-image: linear-gradient(to right,#bdbdbd,#e5f0e7);
+}
+
+.card.gruul {
+    background-image: linear-gradient(to right,#efe1e1,#e5f0e7);
+}
+
+.card.boros {
+    background-image: linear-gradient(to right,#efe1e1,white);
+}
+
+.card.selesnya {
+    background-image: linear-gradient(to right,#e5f0e7,white);
+}
+
+.card.simic {
+    background-image: linear-gradient(to right,#e5f0e7,#e5edf0);
+}
+
+

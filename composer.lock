@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e9b1ce8ebc6a717dfc8655118fc2fb1e",
+    "content-hash": "32bda3b60fcdc9ff732786d9097654c1",
     "packages": [
         {
             "name": "mtgsdk/mtgsdk",
@@ -25,6 +25,7 @@
                 "php-vcr/php-vcr": "^1.2",
                 "phpunit/phpunit": "^5.0"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -42,6 +43,10 @@
                 }
             ],
             "description": "Magic: The Gathering SDK for php",
+            "support": {
+                "issues": "https://github.com/MagicTheGathering/mtg-sdk-php/issues",
+                "source": "https://github.com/MagicTheGathering/mtg-sdk-php/tree/master"
+            },
             "time": "2018-10-12T15:26:21+00:00"
         }
     ],
@@ -54,8 +59,9 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "ext-json": "*"
+        "ext-json": "*",
+        "ext-curl": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "1.1.0"
+    "plugin-api-version": "2.0.0"
 }

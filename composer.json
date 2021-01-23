@@ -1,9 +1,10 @@
 {
     "require": {
       "mtgsdk/mtgsdk": "dev-master",
-      "ext-json": "*"
+      "ext-json": "*",
+      "ext-curl": "*"
     },
   "autoload": {
-    "files": ["./models/Card.php", "models/Deck.php"]
+    "files": ["models/Card.php", "models/Deck.php"]
   }
 }

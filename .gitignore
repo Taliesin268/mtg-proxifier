@@ -1,2 +1,5 @@
 /vendor/
 /.idea/**
+/node_modules/
+/js/*.js
+/js/*.js.map

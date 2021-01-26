@@ -1,0 +1,28 @@
+{
+  "name": "mtg-proxifier",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "type": "module",
+  "dependencies": {
+    "commonjs": "0.0.1",
+    "systemjs": "^6.8.3"
+  },
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.1",
+    "typescript": "^4.1.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Taliesin268/mtg-proxifier.git"
+  },
+  "author": "Adrien Rawsthorne",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Taliesin268/mtg-proxifier/issues"
+  },
+  "homepage": "https://github.com/Taliesin268/mtg-proxifier#readme"
+}

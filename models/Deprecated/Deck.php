@@ -1,12 +1,8 @@
 <?php
 
-namespace Proxifier;
+//namespace Proxifier;
 
 require_once './vendor/autoload.php';
-
-use ArrayAccess;
-use Iterator;
-use JsonSerializable;
 
 /**
  * Class CardList

@@ -5,6 +5,9 @@
       "ext-curl": "*"
     },
   "autoload": {
-    "files": ["models/Card.php", "models/Deck.php"]
+    "files": [
+      "models/Deprecated/Card.php",
+      "models/Deprecated/Deck.php"
+    ]
   }
 }

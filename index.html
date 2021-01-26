@@ -12,6 +12,7 @@
         window.loadDeck = function loadDeck() {
             const cardList = document.getElementById('cardList');
             window.deck = new Deck(cardList.value);
+            console.log(window.deck);
         }
     </script>
     <script>
@@ -20,6 +21,7 @@
 <body>
     <h1>MTG Low-Ink Proxifier</h1>
     <label for="cardList">Please enter your card list:</label>
+    <!--suppress CheckTagEmptyBody -->
     <textarea name="cardList" id="cardList" cols="50" rows="20"></textarea>
     <button onclick="loadDeck()">Load</button>
 </body>

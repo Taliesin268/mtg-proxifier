@@ -36,7 +36,7 @@ export default class Card {
         // Create the main card div
         this.element = document.createElement('div');
         this.element.className = 'card';
-        this.element.id = String(this.id);
+        this.element.id = `card-${this.id}`;
         this.element.setAttribute('name', this.name.toLowerCase());
 
         // Render the card to the page

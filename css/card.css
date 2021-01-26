@@ -1,7 +1,16 @@
-body {
+#print-section {
     display: flex;
     flex-flow: wrap;
+}
+
+body {
     margin: 0;
+}
+
+@media print {
+    #no-print-section {
+        display: none;
+    }
 }
 
 /* BASE CARD LAYOUT */

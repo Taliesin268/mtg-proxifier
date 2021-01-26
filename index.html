@@ -9,11 +9,13 @@
     <script type="module" src="./js/Main.js"></script>
 </head>
 <body>
-    <h1>MTG Low-Ink Proxifier</h1>
-    <label for="cardList">Please enter your card list:</label>
-    <!--suppress CheckTagEmptyBody -->
-    <textarea name="cardList" id="cardList" cols="50" rows="20"></textarea>
-    <button onclick="loadDeck()">Load</button>
+    <div id="no-print-section">
+        <h1>MTG Low-Ink Proxifier</h1>
+        <label for="cardList">Please enter your card list:</label>
+        <!--suppress CheckTagEmptyBody -->
+        <textarea name="cardList" id="cardList" cols="50" rows="20"></textarea>
+        <button onclick="loadDeck()">Load</button>
+    </div>
     <div id="print-section"></div>
 </body>
 </html>

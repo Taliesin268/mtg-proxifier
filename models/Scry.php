@@ -7,6 +7,7 @@ namespace Proxifier;
 class Scry
 {
     public const SEARCH_TERMS = ['name' => ''];
+    public const BASE_URL = 'https://api.scryfall.com';
 
     public static function lookupCard(array $query): Card | null
     {

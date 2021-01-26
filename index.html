@@ -3,22 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <title>MTG Low-Ink Proxifier</title>
-    <script>
-        window.onload = function onLoad() {
-            document.getElementsByTagName('form')[0].onsubmit = function(){
-                let text = document.getElementById('cardlisttext').value;
-                document.getElementById('cardlist').value = JSON.stringify(text.split("\n"));
-            };
+    <link rel="stylesheet" href="css/card.css">
+    <script type="module" src="./js/Card.js"></script>
+    <script type="module" src="./js/Deck.js"></script>
+    <script type="module">
+        import Deck from './js/Deck.js';
+
+        window.loadDeck = function loadDeck() {
+            const cardList = document.getElementById('cardList');
+            window.deck = new Deck(cardList.value);
         }
+    </script>
+    <script>
     </script>
 </head>
 <body>
     <h1>MTG Low-Ink Proxifier</h1>
-    <p>Please enter your card list:</p>
-    <form action="proxifier.php" method="post">
-        <textarea name="cardlisttext" id="cardlisttext" cols="50" rows="20"></textarea>
-        <input type="hidden" name="cardlist" id="cardlist">
-        <input type="submit">
-    </form>
+    <label for="cardList">Please enter your card list:</label>
+    <textarea name="cardList" id="cardList" cols="50" rows="20"></textarea>
+    <button onclick="loadDeck()">Load</button>
 </body>
 </html>

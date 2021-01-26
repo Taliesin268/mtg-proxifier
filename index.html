@@ -6,17 +6,7 @@
     <link rel="stylesheet" href="css/card.css">
     <script type="module" src="./js/Card.js"></script>
     <script type="module" src="./js/Deck.js"></script>
-    <script type="module">
-        import Deck from './js/Deck.js';
-
-        window.loadDeck = function loadDeck() {
-            const cardList = document.getElementById('cardList');
-            window.deck = new Deck(cardList.value);
-            console.log(window.deck);
-        }
-    </script>
-    <script>
-    </script>
+    <script type="module" src="./js/Main.js"></script>
 </head>
 <body>
     <h1>MTG Low-Ink Proxifier</h1>
@@ -24,5 +14,6 @@
     <!--suppress CheckTagEmptyBody -->
     <textarea name="cardList" id="cardList" cols="50" rows="20"></textarea>
     <button onclick="loadDeck()">Load</button>
+    <div id="print-section"></div>
 </body>
 </html>

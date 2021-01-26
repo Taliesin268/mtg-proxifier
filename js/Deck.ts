@@ -1,10 +1,11 @@
 import Card from './Card.js'
+
 /**
  * Represents a deck of MTG cards.
  */
 export default class Deck {
     public length: number = 0;
-    private cards: Card[] = [];
+    public cards: Card[] = [];
 
     // noinspection JSUnusedGlobalSymbols
     /**
@@ -33,7 +34,7 @@ export default class Deck {
             let quantity = 1;
 
             // If the quantity specified is a number, and is greater than 0...
-            if(!isNaN(Number(matches[1])) && Number(matches[1]) > 0) {
+            if (!isNaN(Number(matches[1])) && Number(matches[1]) > 0) {
                 // Use the provided quantity instead.
                 quantity = Number(matches[1]);
             }

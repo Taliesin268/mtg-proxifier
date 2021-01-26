@@ -82,7 +82,7 @@ export default class Card {
         let renderButton = document.createElement('button');
         renderButton.className = 'render-button';
         renderButton.setAttribute('onClick', `deck.render('${this.name.toLowerCase()}')`);
-        renderButton.innerText = 'Render';
+        renderButton.innerText = 'Load';
         imageWrapper.appendChild(renderButton);
     }
 }

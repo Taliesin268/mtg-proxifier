@@ -69,4 +69,12 @@ export default class Deck {
         // Return splice on the card array
         this.cards.splice(start, deleteCount, ...items);
     }
+
+    /**
+     * Loads the card with the provided id.
+     * @param id The id of the card to load.
+     */
+    load(id: number): void {
+        return this.cards[id - 1].load();
+    }
 }

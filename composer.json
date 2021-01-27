@@ -6,8 +6,8 @@
     },
   "autoload": {
     "files": [
-      "models/Deprecated/Card.php",
-      "models/Deprecated/Deck.php"
+      "models/Card.php",
+      "models/Scry.php"
     ]
   }
 }

@@ -1,8 +1,8 @@
 <?php
 
-
 namespace Proxifier;
 
+use Exception;
 
 class Scry
 {
@@ -37,17 +37,40 @@ class Scry
         }
 
         // If no query was built, then return null.
-        if (empty($searchQuery)) {
-            return null;
-        }
+        if (empty($searchQuery)) return null;
 
         //todo finish off the search
-        return new Card();
+        return null;
     }
 
+    /**
+     * Finds a card by name and optional set.
+     *
+     * @param string $name The name of the card you wish to find.
+     * @param string $set Optional. Which set the card is from.
+     * @return Card|null Null if no card was found, otherwise it returns the card with the provided name.
+     */
     public static function lookupCardByName(string $name, string $set = ''): Card|null
     {
+        // If the name does not exist, return null, otherwise add the name to the parameters array.
+        if (empty($name)) return null;
+        $parameters['fuzzy'] = $name;
 
+        // If there is a set, add that too.
+        if (!empty($set)) $parameters['set'] = $set;
+
+        // Get the info from the Scryfall DB.
+        $cardInfo = self::performRequest(self::ENDPOINTS['SearchByName'], $parameters);
+
+        // If the endpoint returned nothing, then we should return null
+        if (empty($cardInfo)) return null;
+
+        // Otherwise return the card
+        try {
+            return new Card($cardInfo);
+        } catch (Exception $e) {
+            return null;
+        }
     }
 
     /**
@@ -66,9 +89,7 @@ class Scry
         $url = self::BASE_URL . $endpoint;
 
         // If the method is GET, put the parameters into the URL.
-        if($method == 'GET') {
-            $url .= '?' . http_build_query($parameters);
-        }
+        if ($method == 'GET') $url .= '?' . http_build_query($parameters);
 
         // Init Curl
         $curl = curl_init($url);

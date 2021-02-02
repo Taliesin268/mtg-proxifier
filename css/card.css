@@ -109,23 +109,23 @@ body {
     background-color: #eeead8;
 }
 
-.card.black {
+.card.b {
     background-color: #bdbdbd;
 }
 
-.card.blue {
+.card.u {
     background-color: #dbeef5;
 }
 
-.card.green {
+.card.g {
     background-color: #dcf9e1;
 }
 
-.card.red {
+.card.r {
     background-color: #efe1e1;
 }
 
-.card.white {
+.card.w {
     background-color: #faf9e5;
 }
 

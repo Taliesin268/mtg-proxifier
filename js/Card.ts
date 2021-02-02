@@ -205,6 +205,7 @@ export default class Card {
         this.number = data.setNumber
         this.text = data.text;
         this.type = data.type;
+        this.colors = data.colors;
 
         // Check each of the optional fields first
         if (data.power) {
@@ -217,6 +218,8 @@ export default class Card {
             this.loyalty = data.loyalty
         }
 
+        console.log(this);
+
         // Change how this card is rendered.
         this.updateCard();
     }
@@ -226,6 +229,9 @@ export default class Card {
      */
     updateCard(): void
     {
+        // Update the card's color
+        this.elements.card.className = `card ${this.getColorString()}`
+
         // Fill in the regular text (and resize it to fit)
         if (this.text != null) {
             this.elements.text.innerHTML = Card.convertManaSymbolsToHtml(this.text.replace('\n', '<br/><br/>'));
@@ -309,5 +315,86 @@ export default class Card {
         // return the HTML tag for this symbol.
         return `<i class='mi mi-${symbol}'></i>`;
 
+    }
+
+    /**
+     * Gets the name of the color of this card.
+     *
+     * @return string The name of the color of this card.
+     */
+    public getColorString(): string
+    {
+        // If it has no colors, it's colorless.
+        if (this.colors == null) {
+            return 'colorless';
+        }
+
+        // If it has more than 2 colors, it's multicolored.
+        if (this.colors.length > 2) {
+            return 'multicolored';
+        }
+
+        // If it's exactly 2 colors, return both colors hyphenated.
+        if (this.colors.length == 2) {
+            return this.getTwoColorHouseName();
+        }
+
+        // If it's only 1 color, return that color.
+        if (this.colors.length == 1) {
+            return this.colors[0].toLowerCase();
+        }
+
+        return 'colorless';
+    }
+
+    /**
+     * Get's the guild name of this card.
+     *
+     * @return string the house name, or '' if invalid colors provided.
+     */
+    private getTwoColorHouseName(): string
+    {
+        if (this.colors?.length != 2) {
+            return '';
+        }
+
+        // Go through the Black colors.
+        if (this.colors.includes('B')) {
+            if (this.colors.includes('U')) {
+                return 'dimir';
+            } else if (this.colors.includes('G')) {
+                return 'golgari';
+            } else if (this.colors.includes('R')) {
+                return 'rakdos';
+            } else if (this.colors.includes('W')) {
+                return 'orzhov';
+            }
+        }
+
+        // Go through the Blue Colors
+        if (this.colors.includes('U')) {
+            if (this.colors.includes('G')) {
+                return 'simic';
+            } else if (this.colors.includes('R')) {
+                return 'izzet';
+            } else if (this.colors.includes('W')) {
+                return 'azorius';
+            }
+        }
+
+        // Go through the Green Colors
+        if (this.colors.includes('G')) {
+            if (this.colors.includes('R')) {
+                return 'gruul';
+            } else if (this.colors.includes('W')) {
+                return 'selesnya';
+            }
+        }
+
+        if (this.colors.includes('Red') && this.colors.includes('W')) {
+            return 'boros';
+        }
+
+        return '';
     }
 }

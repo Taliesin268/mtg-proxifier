@@ -1,10 +1,18 @@
-import {calculateIntendedFontSize, resizeElement} from './FitText.js'
+import {resizeElement} from './FitText.js'
 
+/**
+ * Represents a set in Magic the Gathering.
+ */
 interface Set {
     name: string | undefined;
     code: string | undefined;
 }
 
+/**
+ * Represents the data returned for a single card from the API.
+ *
+ * Note this doesn't represent ALL of the data provided.
+ */
 interface APICardResponse {
     id: string;
     manaCost: string;
@@ -21,6 +29,9 @@ interface APICardResponse {
     colors: string[];
 }
 
+/**
+ * All the HTML components of this card.
+ */
 interface CardElement {
     card: HTMLDivElement;
     content: HTMLDivElement;
@@ -51,6 +62,7 @@ export default class Card {
     type: string | undefined;
     colors: string[] | undefined;
 
+    // Optional fields from the API
     toughness: string | undefined;
     loyalty: string | undefined;
     power: string | undefined;
@@ -176,6 +188,10 @@ export default class Card {
 
     /**
      * Loads data from the API into this card.
+     *
+     * Also refreshes the look of the card
+     * @see updateCard
+     *
      * @param dataString The card object from the API.
      */
     importData(dataString: string): void {
@@ -201,19 +217,16 @@ export default class Card {
             this.loyalty = data.loyalty
         }
 
-        console.log(this);
-
+        // Change how this card is rendered.
         this.updateCard();
     }
 
     /**
      * Updates the card based on the current data
-     *
-     * @return string The HTML representation of this card.
      */
     updateCard(): void
     {
-        // Fill in the regular text
+        // Fill in the regular text (and resize it to fit)
         if (this.text != null) {
             this.elements.text.innerHTML = Card.convertManaSymbolsToHtml(this.text.replace('\n', '<br/><br/>'));
             resizeElement(this.elements.text)
@@ -230,10 +243,18 @@ export default class Card {
             resizeElement(this.elements.type)
         }
 
+        // Update the name (and resize it to fit)
         this.elements.name.innerText = this.name;
         resizeElement(this.elements.name)
     }
 
+    /**
+     * Converts all mana symbols in a block of text into HTML.
+     * @param inputString the text to convert elements from.
+     * @private
+     *
+     * @return returns the original string with the symbols replaced.
+     */
     private static convertManaSymbolsToHtml(inputString: string): string
     {
         return inputString.replace(/{(([A-z0-9]+)(\/([A-z0-9]+))?)}/g, function (
@@ -259,6 +280,16 @@ export default class Card {
 
     }
 
+    /**
+     * Converts an individual mana symbol.
+     *
+     * @param symbol The single letter code for this mana symbol.
+     * @param split Whether this symbol is for a split mana cost. Default false.
+     * @param phyrexian Whether this symbol is phyrexian. Default false. Split should be true if this is.
+     * @private
+     *
+     * @return The HTML version of the provided symbol.
+     */
     private static convertSingleManaSymbol(symbol:string, split = false, phyrexian = false): string
     {
         // Minimise the mana symbol (for use in html).

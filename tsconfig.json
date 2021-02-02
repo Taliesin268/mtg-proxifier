@@ -5,5 +5,5 @@
     "sourceMap": true
   },
   "extends": "@tsconfig/recommended/tsconfig.json",
-  "files": ["js/Deck.ts", "js/Card.ts", "js/Main.ts"]
+  "files": ["js/Deck.ts", "js/Card.ts", "js/Main.ts", "js/FitText.ts"]
 }

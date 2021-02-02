@@ -1,3 +1,5 @@
+import {calculateIntendedFontSize, resizeElement} from './FitText.js'
+
 interface Set {
     name: string | undefined;
     code: string | undefined;
@@ -19,13 +21,24 @@ interface APICardResponse {
     colors: string[];
 }
 
+interface CardElement {
+    card: HTMLDivElement;
+    content: HTMLDivElement;
+    header: HTMLDivElement;
+    name: HTMLDivElement;
+    manaCost: HTMLDivElement;
+    imageWrapper: HTMLDivElement;
+    type: HTMLDivElement;
+    text: HTMLDivElement;
+}
+
 /**
  * Class representing a Magic the Gathering card.
  */
 export default class Card {
     id: number;
     reg: RegExp = /^(\[([A-Z0-9]+)#?([A-Z0-9]+)] )?(.*)$/
-    element: HTMLElement | undefined;
+    elements!: CardElement;
 
     // Fields derived from the provided string
     name: string;
@@ -51,6 +64,7 @@ export default class Card {
      */
     constructor(inputText: string, id: number) {
         const matches = this.reg.exec(inputText);
+
         if (matches) {
             this.name = matches[4];
             this.set = {
@@ -61,66 +75,79 @@ export default class Card {
         } else {
             throw new Error('No Text Provided for Card');
         }
+
         this.id = id;
+
+        this.initElements();
     }
 
     /**
-     * Creates a card under the provided parent.
+     * Creates all the elements of the Card, but does not render them to the screen.
+     *
+     * @private
+     */
+    private initElements(){
+        this.elements = {
+            card: document.createElement('div'),
+            content: document.createElement('div'),
+            header: document.createElement('div'),
+            name: document.createElement('div'),
+            manaCost: document.createElement('div'),
+            imageWrapper: document.createElement('div'),
+            type: document.createElement('div'),
+            text: document.createElement('div'),
+        }
+
+        // Create the main card div
+        this.elements.card.className = 'card';
+        this.elements.card.id = `card-${this.id}`;
+        this.elements.card.setAttribute('name', this.name.toLowerCase());
+
+        // Create the content wrapper
+        this.elements.content.className = 'card-content';
+        this.elements.card.appendChild(this.elements.content);
+
+        // Create the header
+        this.elements.header.className = 'card-header'
+        this.elements.content.appendChild(this.elements.header);
+
+        // Create the cardname
+        this.elements.name.className = 'card-name auto-resize';
+        this.elements.name.innerText = this.name;
+        this.elements.header.appendChild(this.elements.name);
+
+        // Create the manacost
+        this.elements.manaCost.className = 'mana-cost';
+        this.elements.header.appendChild(this.elements.manaCost);
+
+        // Create the image wrapper
+        this.elements.imageWrapper.className = 'card-image';
+        this.elements.content.appendChild(this.elements.imageWrapper);
+
+        // Create the type box
+        this.elements.type.className = 'card-type';
+        this.elements.content.appendChild(this.elements.type);
+
+        // Create the text box
+        this.elements.text.className = 'card-text';
+        this.elements.content.appendChild(this.elements.text);
+    }
+
+    /**
+     * Renders this card under the provided parent.
      *
      * @param parent What element to place this card under.
      */
     renderTemplate(parent: HTMLElement): void {
-        // Create the main card div
-        this.element = document.createElement('div');
-        this.element.className = 'card';
-        this.element.id = `card-${this.id}`;
-        this.element.setAttribute('name', this.name.toLowerCase());
-
-        // Render the card to the page
-        parent.appendChild(this.element);
-
-        // Create the content wrapper
-        let cardContent = document.createElement('div');
-        cardContent.className = 'card-content';
-        this.element.appendChild(cardContent);
-
-        // Create the header
-        let cardHeader = document.createElement('div');
-        cardHeader.className = 'card-header'
-        cardContent.appendChild(cardHeader);
-
-        // Create the cardname
-        let cardName = document.createElement('div');
-        cardName.className = 'card-name auto-resize';
-        cardName.innerText = this.name;
-        cardHeader.appendChild(cardName);
-
-        // Create the manacost
-        let manaCost = document.createElement('div');
-        manaCost.className = 'mana-cost';
-        cardHeader.appendChild(manaCost);
-
-        // Create the image wrapper
-        let imageWrapper = document.createElement('div');
-        imageWrapper.className = 'card-image';
-        cardContent.appendChild(imageWrapper);
-
-        // Create the type box
-        let cardType = document.createElement('div');
-        cardType.className = 'card-type';
-        cardContent.appendChild(cardType);
-
-        // Create the text box
-        let cardText = document.createElement('div');
-        cardText.className = 'card-text';
-        cardContent.appendChild(cardText);
-
         // Create a button to render content
         let renderButton = document.createElement('button');
         renderButton.className = 'render-button';
         renderButton.setAttribute('onClick', `deck.load('${this.id}')`);
         renderButton.innerText = 'Load';
-        imageWrapper.appendChild(renderButton);
+        this.elements.imageWrapper.appendChild(renderButton);
+
+        // Render the card to the page
+        parent.appendChild(this.elements.card);
     }
 
     /**
@@ -175,5 +202,81 @@ export default class Card {
         }
 
         console.log(this);
+
+        this.updateCard();
+    }
+
+    /**
+     * Updates the card based on the current data
+     *
+     * @return string The HTML representation of this card.
+     */
+    updateCard(): void
+    {
+        // Fill in the regular text
+        if (this.text != null) {
+            this.elements.text.innerHTML = Card.convertManaSymbolsToHtml(this.text.replace('\n', '<br/><br/>'));
+            resizeElement(this.elements.text)
+        }
+
+        // Fill in the mana cost
+        if (this.manaCost != null) {
+            this.elements.manaCost.innerHTML = Card.convertManaSymbolsToHtml(this.manaCost);
+        }
+
+        // Fill in the type (and resize it to fit)
+        if (this.type != null) {
+            this.elements.type.innerText = this.type;
+            resizeElement(this.elements.type)
+        }
+
+        this.elements.name.innerText = this.name;
+        resizeElement(this.elements.name)
+    }
+
+    private static convertManaSymbolsToHtml(inputString: string): string
+    {
+        return inputString.replace(/{(([A-z0-9]+)(\/([A-z0-9]+))?)}/g, function (
+            match: string,
+            fullSymbol,
+            symbol1,
+            slashSymbol,
+            symbol2
+            ): string {
+            if (symbol2 == null) {
+                return Card.convertSingleManaSymbol(symbol1);
+            } else if (symbol2 == 'P') {
+                return Card.convertSingleManaSymbol(symbol2, true, true);
+            } else if (symbol1 == 'P') {
+                return Card.convertSingleManaSymbol(symbol1, true, true);
+            } else {
+                return '<div class="mi-split">'
+                    + Card.convertSingleManaSymbol(symbol1, true)
+                    + Card.convertSingleManaSymbol(symbol2, true)
+                    + '</div>';
+            }
+        });
+
+    }
+
+    private static convertSingleManaSymbol(symbol:string, split = false, phyrexian = false): string
+    {
+        // Minimise the mana symbol (for use in html).
+        symbol = symbol.toLowerCase();
+
+        // Convert 'q' into 'untap'.
+        symbol = symbol == 'q' ? 'untap' : symbol;
+
+        // If it's for a split mana symbol, add 'mi-mana'.
+        if (!split) {
+            symbol += ' mi-mana';
+        } else if (phyrexian) {
+            // If it's phyrexian mana, make it 'mi-p mi-mana-manaSymbol'.
+            symbol = 'p mi-mana-' + symbol;
+        }
+
+        // return the HTML tag for this symbol.
+        return `<i class='mi mi-${symbol}'></i>`;
+
     }
 }

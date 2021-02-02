@@ -41,6 +41,8 @@ interface CardElement {
     imageWrapper: HTMLDivElement;
     type: HTMLDivElement;
     text: HTMLDivElement;
+    footer: HTMLDivElement | undefined;
+    power: HTMLDivElement | undefined;
 }
 
 /**
@@ -108,6 +110,8 @@ export default class Card {
             imageWrapper: document.createElement('div'),
             type: document.createElement('div'),
             text: document.createElement('div'),
+            footer: undefined,
+            power: undefined
         }
 
         // Create the main card div
@@ -143,6 +147,21 @@ export default class Card {
         // Create the text box
         this.elements.text.className = 'card-text';
         this.elements.content.appendChild(this.elements.text);
+    }
+
+    private constructFooter(power: string): void
+    {
+        if(this.elements.power == undefined) {
+            this.elements.footer = document.createElement('div');
+            this.elements.footer.className = 'card-footer';
+            this.elements.text.className += ' has-footer';
+            this.elements.power = document.createElement('div');
+            this.elements.power.className = 'power-block';
+            this.elements.footer.appendChild(this.elements.power);
+            this.elements.content.appendChild(this.elements.footer);
+        }
+
+        this.elements.power.innerText = power;
     }
 
     /**
@@ -232,9 +251,16 @@ export default class Card {
         // Update the card's color
         this.elements.card.className = `card ${this.getColorString()}`
 
+        // Update the power & toughness or loyalty
+        if(this.power && this.toughness) {
+            this.constructFooter(`${this.power} / ${this.toughness}`)
+        } else if(this.loyalty) {
+            this.constructFooter(`${this.loyalty}`)
+        }
+
         // Fill in the regular text (and resize it to fit)
         if (this.text != null) {
-            this.elements.text.innerHTML = Card.convertManaSymbolsToHtml(this.text.replace('\n', '<br/><br/>'));
+            this.elements.text.innerHTML = Card.convertManaSymbolsToHtml(this.text.replace(/\n/g, '<br/><br/>'));
             resizeElement(this.elements.text)
         }
 

@@ -87,7 +87,7 @@ body {
     height: 140px;
 }
 .card-text.has-footer {
-    height: 105px;
+    height: 102px;
 }
 
 .card-footer {
@@ -102,6 +102,9 @@ body {
     border: 1px solid lightgrey;
     margin: auto 1px;
     padding: 5px;
+    min-height: 16px;
+    min-width: 16px;
+    text-align: center;
 }
 
 /* COLORS */

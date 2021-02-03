@@ -19,12 +19,19 @@ interface APICardResponse {
     name: string;
     setNumber: string;
     text: string;
-    type: string;
 
+    // Types
+    type: string;
+    superTypes: string[] | string;
+    cardTypes: string[] | string;
+    subTypes: string[] | string;
+
+    // Powers
     power: string | undefined;
     toughness: string | undefined;
     loyalty: string | undefined;
 
+    // Non-strings
     set: Set;
     colors: string[];
 }
@@ -61,8 +68,13 @@ export default class Card {
     // Fields set by the API
     manaCost: string | undefined;
     text: string | undefined;
-    type: string | undefined;
     colors: string[] | undefined;
+
+    // Types
+    type: string | undefined;
+    superTypes: string[] | string | undefined;
+    cardTypes: string[] | string | undefined;
+    subTypes: string[] | string | undefined;
 
     // Optional fields from the API
     toughness: string | undefined;
@@ -100,7 +112,7 @@ export default class Card {
      *
      * @private
      */
-    private initElements(){
+    private initElements() {
         this.elements = {
             card: document.createElement('div'),
             content: document.createElement('div'),
@@ -149,9 +161,8 @@ export default class Card {
         this.elements.content.appendChild(this.elements.text);
     }
 
-    private constructFooter(power: string): void
-    {
-        if(this.elements.power == undefined) {
+    private constructFooter(power: string): void {
+        if (this.elements.power == undefined) {
             this.elements.footer = document.createElement('div');
             this.elements.footer.className = 'card-footer';
             this.elements.text.className += ' has-footer';
@@ -223,8 +234,13 @@ export default class Card {
         this.set = data.set;
         this.number = data.setNumber
         this.text = data.text;
-        this.type = data.type;
         this.colors = data.colors;
+
+        // Types
+        this.type = data.type;
+        this.superTypes = data.superTypes;
+        this.cardTypes = data.cardTypes;
+        this.subTypes = data.subTypes;
 
         // Check each of the optional fields first
         if (data.power) {
@@ -246,15 +262,14 @@ export default class Card {
     /**
      * Updates the card based on the current data
      */
-    updateCard(): void
-    {
+    updateCard(): void {
         // Update the card's color
         this.elements.card.className = `card ${this.getColorString()}`
 
         // Update the power & toughness or loyalty
-        if(this.power && this.toughness) {
+        if (this.power && this.toughness) {
             this.constructFooter(`${this.power} / ${this.toughness}`)
-        } else if(this.loyalty) {
+        } else if (this.loyalty) {
             this.constructFooter(`${this.loyalty}`)
         }
 
@@ -278,6 +293,10 @@ export default class Card {
         // Update the name (and resize it to fit)
         this.elements.name.innerText = this.name;
         resizeElement(this.elements.name)
+
+        // Set the image
+        this.elements.imageWrapper.innerHTML = '';
+        this.elements.imageWrapper.appendChild(Card.getSingleImageIcon(this.cardTypes));
     }
 
     /**
@@ -287,15 +306,14 @@ export default class Card {
      *
      * @return returns the original string with the symbols replaced.
      */
-    private static convertManaSymbolsToHtml(inputString: string): string
-    {
+    private static convertManaSymbolsToHtml(inputString: string): string {
         return inputString.replace(/{(([A-z0-9]+)(\/([A-z0-9]+))?)}/g, function (
             match: string,
             fullSymbol,
             symbol1,
             slashSymbol,
             symbol2
-            ): string {
+        ): string {
             if (symbol2 == null) {
                 return Card.convertSingleManaSymbol(symbol1);
             } else if (symbol2 == 'P') {
@@ -322,8 +340,7 @@ export default class Card {
      *
      * @return The HTML version of the provided symbol.
      */
-    private static convertSingleManaSymbol(symbol:string, split = false, phyrexian = false): string
-    {
+    private static convertSingleManaSymbol(symbol: string, split = false, phyrexian = false): string {
         // Minimise the mana symbol (for use in html).
         symbol = symbol.toLowerCase();
 
@@ -348,8 +365,7 @@ export default class Card {
      *
      * @return string The name of the color of this card.
      */
-    public getColorString(): string
-    {
+    public getColorString(): string {
         // If it has no colors, it's colorless.
         if (this.colors == null) {
             return 'colorless';
@@ -378,8 +394,7 @@ export default class Card {
      *
      * @return string the house name, or '' if invalid colors provided.
      */
-    private getTwoColorHouseName(): string
-    {
+    private getTwoColorHouseName(): string {
         if (this.colors?.length != 2) {
             return '';
         }
@@ -422,5 +437,42 @@ export default class Card {
         }
 
         return '';
+    }
+
+    /**
+     * Gets the icon for a particular type.
+     *
+     * @return string the HTML for this icon.
+     * @param types
+     */
+    private static getSingleImageIcon(types: string | string[] | undefined): HTMLDivElement {
+        let imageDiv = document.createElement('div');
+        imageDiv.className = `image-icon`;
+        if (typeof (types) == 'undefined') {
+            return imageDiv;
+        } else if (typeof (types) != 'string') {
+            imageDiv.className += ' split';
+        } else {
+            types = [types];
+        }
+
+        let type = "";
+
+        for (type in types) {
+            switch (types[type]) {
+                case 'Artifact':
+                case 'Creature':
+                case 'Enchantment':
+                case 'Instant':
+                case 'Land':
+                case 'Planeswalker':
+                case 'Sorcery':
+                    let image = document.createElement('IMG');
+                    image.setAttribute('src', `./svg/${types[type].toLowerCase()}.svg`);
+                    imageDiv.appendChild(image);
+            }
+        }
+
+        return imageDiv;
     }
 }

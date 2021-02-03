@@ -52,6 +52,9 @@ class Set {
  */
 class Card implements JsonSerializable
 {
+    const SUPERTYPES = ['Basic', 'Legendary', 'Snow', 'World'];
+    const CARD_TYPES = ['Artifact', 'Creature', 'Enchantment', 'Instant', 'Land', 'Planeswalker', 'Sorcery'];
+
     public string $rawQuery;
 
     public string $id;
@@ -99,6 +102,49 @@ class Card implements JsonSerializable
         $this->colors = $card->colors ?? [];
     }
 
+    public function getSuperTypes(): string|array
+    {
+        $types = explode(' ', $this->type);
+        $types = array_map('trim', $types);
+        $supertypes = array_intersect($types, self::SUPERTYPES);
+        $supertypes = array_values($supertypes);
+        if (count($supertypes) == 1) {
+            return $supertypes[0];
+        } else {
+            return array_values($supertypes);
+        }
+    }
+
+    public function getCardTypes(): string|array
+    {
+        $types = explode(' ', $this->type);
+        $types = array_map('trim', $types);
+        $cardtypes = array_intersect($types, self::CARD_TYPES);
+        $cardtypes = array_values($cardtypes);
+        if (count($cardtypes) == 1) {
+            return $cardtypes[0];
+        } else {
+            return array_values($cardtypes);
+        }
+    }
+
+    public function getSubTypes(): string|array
+    {
+        $types = explode('—', $this->type);
+        if (count($types) <= 1) {
+            return [];
+        }
+        $subtypes = explode(' ', $types[1]);
+        $subtypes = array_map('trim', $subtypes);
+        $subtypes = array_filter($subtypes);
+        $subtypes = array_values($subtypes);
+        if (count($subtypes) == 1) {
+            return $subtypes[0];
+        } else {
+            return $subtypes;
+        }
+    }
+
     /**
      * Convert the card to json.
      *
@@ -114,7 +160,12 @@ class Card implements JsonSerializable
             'type' => $this->type,
             'text' => $this->text,
             'set' => $this->set,
-            'setNumber' => $this->setNumber
+            'setNumber' => $this->setNumber,
+
+            // Cards
+            'superTypes' => $this->getSuperTypes(),
+            'cardTypes' => $this->getCardTypes(),
+            'subTypes' => $this->getSubTypes()
         ];
 
         // If it's a creature, add power and toughness.

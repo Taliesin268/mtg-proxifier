@@ -80,19 +80,25 @@ class Scry
      * @param array $parameters The parameters to get passed in as part of this request.
      * @param string $method Determines which HTTP method to use. Default 'GET'.
      * @return string The result we get from the Scryfall API.
-     *
-     * @todo Implement POST version
      */
     private static function performRequest(string $endpoint, array $parameters, string $method = 'GET'): string
     {
         // Set the url
         $url = self::BASE_URL . $endpoint;
 
-        // If the method is GET, put the parameters into the URL.
-        if ($method == 'GET') $url .= '?' . http_build_query($parameters);
-
         // Init Curl
-        $curl = curl_init($url);
+        $curl = curl_init();
+
+        if ($method == 'GET') {
+            // If the method is GET, put the parameters into the URL.
+            $url .= '?' . http_build_query($parameters);
+        } else if ($method == 'POST') {
+            // If the method is POST, put the parameters into the post body.
+            curl_setopt_array($curl, [
+                CURLOPT_POST => count($parameters),
+                CURLOPT_POSTFIELDS => http_build_query($parameters)
+            ]);
+        }
         // Set out options
         curl_setopt_array($curl, [
             // Accept and content type is JSON
@@ -104,6 +110,9 @@ class Scry
             CURLOPT_RETURNTRANSFER => true,
             // Timeout after 30 seconds of waiting
             CURLOPT_TIMEOUT => 30,
+            // Explicitly state the method
+            CURLOPT_CUSTOMREQUEST => $method,
+            CURLOPT_URL => $url
         ]);
 
         // Execute the curl command

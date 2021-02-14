@@ -24,11 +24,20 @@ body {
     font-size: 14px;
 }
 
+.card.error {
+    background-color: red;
+}
+@media print {
+    .card.error {
+        display: none;
+    }
+}
+
 .card-header {
     display: flex;
     justify-content: space-between;
     border-bottom: 1px solid lightgrey;
-    padding: 3px 4px 0px 4px;
+    padding: 3px 4px 0 4px;
     margin-bottom: 1px;
     /*height: 17px;*/
 }
@@ -92,7 +101,7 @@ body {
 
 .card-footer {
     height: 34px;
-    padding: 0px 2px 0px 0;
+    padding: 0 2px 0 0;
     display: flex;
     justify-content: flex-end;
     border-top: 1px solid lightgrey;

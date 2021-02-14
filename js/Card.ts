@@ -89,6 +89,7 @@ export default class Card {
      * @param id a unique id for this card
      */
     constructor(inputText: string, id: number) {
+        // Get the components from the regex query.
         const matches = this.reg.exec(inputText);
 
         if (matches) {
@@ -161,6 +162,11 @@ export default class Card {
         this.elements.content.appendChild(this.elements.text);
     }
 
+    /**
+     * Creates the footer section for this card.
+     * @param power Either the creature's power / toughness or the planeswalker's loyalty
+     * @private
+     */
     private constructFooter(power: string): void {
         if (this.elements.power == undefined) {
             this.elements.footer = document.createElement('div');
@@ -181,39 +187,8 @@ export default class Card {
      * @param parent What element to place this card under.
      */
     renderTemplate(parent: HTMLElement): void {
-        // Create a button to render content
-        let renderButton = document.createElement('button');
-        renderButton.className = 'render-button';
-        renderButton.setAttribute('onClick', `deck.load('${this.id}')`);
-        renderButton.innerText = 'Load';
-        this.elements.imageWrapper.appendChild(renderButton);
-
         // Render the card to the page
         parent.appendChild(this.elements.card);
-    }
-
-    /**
-     * Loads a card's data from the API.
-     */
-    load(): void {
-        // Create a new HTTP request
-        let xhttp = new XMLHttpRequest();
-
-        // Save 'this' in a variable so we can access it inside the anonymous function later
-        let card = this;
-
-        // Add a function for when this becomes more ready
-        xhttp.onreadystatechange = function () {
-            // If this XHR request is completely ready
-            if (this.readyState == 4 && this.status == 200) {
-                // Import the data from the endpoint into this card
-                card.importData(this.responseText);
-            }
-        };
-        // Connect to the API
-        xhttp.open("GET", encodeURI(`/api/GetCard.php?name=${this.name}`), true);
-        // and Send the request
-        xhttp.send();
     }
 
     /**
@@ -224,9 +199,15 @@ export default class Card {
      *
      * @param dataString The card object from the API.
      */
-    importData(dataString: string): void {
+    importData(dataString: string | APICardResponse): void {
+        let data: APICardResponse;
+
         // Get the APICardResponse object
-        let data: APICardResponse = JSON.parse(dataString);
+        if (typeof dataString == "string") {
+            data = JSON.parse(dataString);
+        } else {
+            data = dataString;
+        }
 
         // Update the fields on this class using the fields in the data.
         this.name = data.name;
@@ -252,8 +233,6 @@ export default class Card {
         if (data.loyalty) {
             this.loyalty = data.loyalty
         }
-
-        console.log(this);
 
         // Change how this card is rendered.
         this.updateCard();
@@ -307,6 +286,7 @@ export default class Card {
      * @return returns the original string with the symbols replaced.
      */
     private static convertManaSymbolsToHtml(inputString: string): string {
+        // Search for mana symbols in the provided text (should look like {b} or {p/u})
         return inputString.replace(/{(([A-z0-9]+)(\/([A-z0-9]+))?)}/g, function (
             match: string,
             fullSymbol,
@@ -315,12 +295,16 @@ export default class Card {
             symbol2
         ): string {
             if (symbol2 == null) {
+                // If there's only 1 symbol, return the HTML for that symbol.
                 return Card.convertSingleManaSymbol(symbol1);
             } else if (symbol2 == 'P') {
+                // If the second symbol is 'P', return the phyrexian mana for the first symbol.
                 return Card.convertSingleManaSymbol(symbol1, true, true);
             } else if (symbol1 == 'P') {
+                // If the first symbol is 'P', return the phyrexian mana for the second symbol.
                 return Card.convertSingleManaSymbol(symbol2, true, true);
             } else {
+                // If there are more than 1 symbol, return a split mana symbol.
                 return '<div class="mi-split">'
                     + Card.convertSingleManaSymbol(symbol1, true)
                     + Card.convertSingleManaSymbol(symbol2, true)
@@ -356,8 +340,8 @@ export default class Card {
         }
 
         // return the HTML tag for this symbol.
+        // noinspection CheckTagEmptyBody If not closed, will create further tags as child elements.
         return `<i class='mi mi-${symbol}'></i>`;
-
     }
 
     /**
@@ -446,19 +430,23 @@ export default class Card {
      * @param types
      */
     private static getSingleImageIcon(types: string | string[] | undefined): HTMLDivElement {
+        // Create the div to wrap the image(s)
         let imageDiv = document.createElement('div');
         imageDiv.className = `image-icon`;
+
         if (typeof (types) == 'undefined') {
+            // If there are no types, leave the image wrapper empty.
             return imageDiv;
         } else if (typeof (types) != 'string') {
+            // If there are multiple types, apply the 'split' class.
             imageDiv.className += ' split';
         } else {
+            // If there is only 1 type, place it into an array.
             types = [types];
         }
 
-        let type = "";
-
-        for (type in types) {
+        // For each type...
+        for (let type in types) {
             switch (types[type]) {
                 case 'Artifact':
                 case 'Creature':
@@ -467,6 +455,7 @@ export default class Card {
                 case 'Land':
                 case 'Planeswalker':
                 case 'Sorcery':
+                    // If it's one of the known types, create an image with that type's SVG.
                     let image = document.createElement('IMG');
                     image.setAttribute('src', `./svg/${types[type].toLowerCase()}.svg`);
                     imageDiv.appendChild(image);
@@ -479,8 +468,44 @@ export default class Card {
     /**
      * Destroys this card.
      */
-    public deconstruct(): void
-    {
+    public deconstruct(): void {
         this.elements.card.remove();
+    }
+
+    /**
+     * Sets the card to a loading state.
+     * @param state if true, set loading, else disable loading.
+     */
+    public setLoading(state: boolean): void {
+        if (state) {
+            // Set loading
+            this.elements.card.classList.add('loading');
+
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner'
+
+            // Add 12 divs for spinning
+            for (let i = 0; i < 12; i++) {
+                const spinnerDiv = document.createElement('div');
+                spinnerDiv.className = 'spinnerdiv';
+                spinner.appendChild(spinnerDiv);
+            }
+            this.elements.imageWrapper.appendChild(spinner);
+        } else {
+            // Unset loading
+            this.elements.card.classList.remove('loading');
+            const spinner = document.querySelector(`#${this.elements.card.id} .imageWrapper .spinner`);
+            if (spinner) {
+                spinner.remove();
+            }
+        }
+    }
+
+    /**
+     * Sets the card to an error state.
+     */
+    public setError(message: string): void {
+        this.elements.card.classList.add('error');
+        this.elements.text.innerText = message;
     }
 }

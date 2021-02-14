@@ -1,4 +1,3 @@
-import Card from './Card.js';
 import Deck from './Deck.js';
 
 // Define what variables we have in the window.
@@ -16,7 +15,7 @@ declare global {
 window.loadDeck = function loadDeck() {
     // Get the card list, and create a deck from it.
     const cardList: HTMLTextAreaElement = <HTMLTextAreaElement>document.getElementById('cardList');
-    if (window.deck){
+    if (window.deck) {
         window.deck.deconstruct();
     }
     window.deck = new Deck(cardList.value);
@@ -26,7 +25,5 @@ window.loadDeck = function loadDeck() {
 
     // Render each card in the deck to the print section.
     let printSection = <HTMLDivElement>document.getElementById('print-section');
-    window.deck.cards.forEach((card: Card) => {
-        card.renderTemplate(printSection);
-    });
+    window.deck.deckInit(printSection);
 }

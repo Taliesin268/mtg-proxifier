@@ -7,7 +7,6 @@ export default class Deck {
     public length: number = 0;
     public cards: Card[] = [];
 
-    // noinspection JSUnusedGlobalSymbols
     /**
      * Creates a deck from a provided decklist string.
      *
@@ -16,6 +15,10 @@ export default class Deck {
     constructor(decklist: string) {
         // Split the provided decklist by newlines.
         let decklistArray: string[] = decklist.split('\n');
+        // Remove any empty elements.
+        decklistArray = decklistArray.filter(function(val){
+            return val != '';
+        });
 
         // Define the regex used for determining the quantity (if provided) and the card name.
         const findQuantity: RegExp = /^([0-9]+ )?(.*)/
@@ -71,19 +74,83 @@ export default class Deck {
     }
 
     /**
-     * Loads the card with the provided id.
-     * @param id The id of the card to load.
-     */
-    load(id: number): void {
-        return this.cards[id - 1].load();
-    }
-
-    /**
      * Deconstructs this deck.
      */
     public deconstruct(): void {
+        // Deconstruct each of the cards
         this.cards.forEach(function (card) {
             card.deconstruct();
         });
+    }
+
+    /**
+     * Gets all the card details by name from the API.
+     */
+    public getAllCardDetails(): void {
+        // Create a new HTTP request
+        let xhttp = new XMLHttpRequest();
+
+        // Save 'this' in a variable so we can access it inside the anonymous function later
+        let deck = this;
+
+        // Add a function for when this becomes more ready
+        xhttp.onreadystatechange = function () {
+            // If this XHR request is completely ready
+            if (this.readyState == 4 && this.status == 200) {
+                // Import the data from the endpoint into this deck
+                deck.processMultiCardResponse(this.responseText);
+            }
+        };
+
+        // Connect to the API
+        xhttp.open("POST", encodeURI(`/api/GetCard.php`), true);
+
+        // Get the list of card names (and set each card to 'loading')
+        let names: string[] = [];
+        this.cards.forEach(function (card) {
+            names.push(card.name);
+        });
+
+        // and Send the request
+        xhttp.send(JSON.stringify({names: names}));
+    }
+
+    /**
+     * Handle the response from getAllCardDetails().
+     *
+     * @param response the raw JSON response from getAllCardDetails().
+     */
+    public processMultiCardResponse(response: string): void {
+        // Parse the response
+        const data = JSON.parse(response);
+
+        // Render each card from the list
+        this.cards.forEach(function (card){
+            // Remove its 'loading' status
+            card.setLoading(false);
+            if (card.name in data.found){
+                // If the card was found, then load its data
+                card.importData(data.found[card.name]);
+            } else {
+                // If the card wasn't found, set it to error
+                card.setError('Card not found');
+            }
+        });
+    }
+
+    /**
+     * Initialises the deck.
+     * @param printSection What element to print the deck under.
+     */
+    public deckInit(printSection: HTMLDivElement): void {
+        // Render each card's template
+        window.deck.cards.forEach((card: Card) => {
+            card.renderTemplate(printSection);
+            // Set the card to 'loading' (will be removed in processMultiCardResponse)
+            card.setLoading(true);
+        });
+
+        // Load all this deck's card details from the API.
+        this.getAllCardDetails();
     }
 }

@@ -141,6 +141,9 @@ class Scry
         // Make sure the array is properly indexed
         $names = array_values($names);
 
+        // Remove any empty values
+        $names = array_filter($names);
+
         // If no names were provided, return an empty array
         if (empty($names)) {
             return [];

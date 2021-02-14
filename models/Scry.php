@@ -9,7 +9,7 @@ class Scry
     /** @var string The base URL for all requests. */
     public const BASE_URL = 'https://api.scryfall.com';
     /** @var string[] All available endpoints. In the format 'Name' => '/path'. */
-    public const ENDPOINTS = ['SearchByName' => '/cards/named', 'Search' => '/cards/search'];
+    public const ENDPOINTS = ['SearchByName' => '/cards/named', 'Search' => '/cards/search', 'Collection' => '/cards/collection'];
     /** @var string[] Available search terms and their prefix. In the format 'name' => 'prefix'. */
     public const SEARCH_TERMS = ['name' => ''];
 
@@ -79,9 +79,10 @@ class Scry
      * @param string $endpoint Which endpoint to go to (from Scry::Endpoints).
      * @param array $parameters The parameters to get passed in as part of this request.
      * @param string $method Determines which HTTP method to use. Default 'GET'.
+     * @param string $contentType Whether this is 'form-data' or 'json'
      * @return string The result we get from the Scryfall API.
      */
-    private static function performRequest(string $endpoint, array $parameters, string $method = 'GET'): string
+    private static function performRequest(string $endpoint, array $parameters, string $method = 'GET', string $contentType = 'form-data'): string
     {
         // Set the url
         $url = self::BASE_URL . $endpoint;
@@ -94,11 +95,19 @@ class Scry
             $url .= '?' . http_build_query($parameters);
         } else if ($method == 'POST') {
             // If the method is POST, put the parameters into the post body.
-            curl_setopt_array($curl, [
-                CURLOPT_POST => count($parameters),
-                CURLOPT_POSTFIELDS => http_build_query($parameters)
-            ]);
+            if ($contentType == 'form-data') {
+                curl_setopt_array($curl, [
+                    CURLOPT_POST => count($parameters),
+                    CURLOPT_POSTFIELDS => http_build_query($parameters)
+                ]);
+            } else if ($contentType == 'json') {
+                curl_setopt_array($curl, [
+                    CURLOPT_POST => 1,
+                    CURLOPT_POSTFIELDS => json_encode($parameters)
+                ]);
+            }
         }
+
         // Set out options
         curl_setopt_array($curl, [
             // Accept and content type is JSON
@@ -122,5 +131,53 @@ class Scry
 
         // Return the result from the curl request
         return $result;
+    }
+
+    public static function lookupManyCardsByNames(array $names): array
+    {
+        // Remove any duplicate names
+        $names = array_unique($names);
+
+        // Make sure the array is properly indexed
+        $names = array_values($names);
+
+        // If no names were provided, return an empty array
+        if (empty($names)) {
+            return [];
+        }
+
+        // Set the parameters array
+        $parameters = [];
+        foreach ($names as $id => $name) {
+            $parameters['identifiers'][$id] = ['name' => $name];
+        }
+
+        // Get the list of found cards
+        $foundCardsJson = self::performRequest(self::ENDPOINTS['Collection'], $parameters, 'POST', 'json');
+        $foundCards = json_decode($foundCardsJson);
+
+        if (empty($foundCards->not_found)) {
+            $notFound = [];
+        } else {
+            $notFound = array_column($foundCards->not_found, 'name');
+        }
+        $found = [];
+
+        // Initialise the offset (for use in determining the position of a card)
+        $offset = 0;
+
+        foreach ($names as $id => $name) {
+            // If the card wasn't found, then proceed to the next name, and we're now offset by one item.
+            if (in_array($name, $notFound)) {
+                $offset++;
+                continue;
+            }
+
+            // Create a new card at this offset
+            $found[$name] = new Card($foundCards->data[$id - $offset]);
+        }
+
+        // Return the found and not found arrays
+        return ['notFound' => $notFound, 'found' => $found];
     }
 }

@@ -77,4 +77,13 @@ export default class Deck {
     load(id: number): void {
         return this.cards[id - 1].load();
     }
+
+    /**
+     * Deconstructs this deck.
+     */
+    public deconstruct(): void {
+        this.cards.forEach(function (card) {
+            card.deconstruct();
+        });
+    }
 }

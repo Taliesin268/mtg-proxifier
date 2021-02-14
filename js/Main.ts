@@ -16,6 +16,9 @@ declare global {
 window.loadDeck = function loadDeck() {
     // Get the card list, and create a deck from it.
     const cardList: HTMLTextAreaElement = <HTMLTextAreaElement>document.getElementById('cardList');
+    if (window.deck){
+        window.deck.deconstruct();
+    }
     window.deck = new Deck(cardList.value);
 
     // Log the deck to the console.

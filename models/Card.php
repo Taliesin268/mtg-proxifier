@@ -4,6 +4,7 @@ namespace Proxifier;
 
 use Exception;
 use JsonSerializable;
+use stdClass;
 
 /**
  * Class Set
@@ -55,8 +56,6 @@ class Card implements JsonSerializable
     const SUPERTYPES = ['Basic', 'Legendary', 'Snow', 'World'];
     const CARD_TYPES = ['Artifact', 'Creature', 'Enchantment', 'Instant', 'Land', 'Planeswalker', 'Sorcery'];
 
-    public string $rawQuery;
-
     public string $id;
     public string $name;
     public string $manaCost;
@@ -73,17 +72,19 @@ class Card implements JsonSerializable
     /**
      * Card constructor.
      *
-     * @param string $cardInfo The raw Scryfall DB response for this card.
+     * @param stdClass|string $cardInfo The raw Scryfall DB response for this card.
      * @throws Exception If the card could not be created.
      */
-    public function __construct(string $cardInfo)
+    public function __construct(string | stdClass $cardInfo)
     {
         // Decode the data
-        $card = json_decode($cardInfo);
-        if (empty($card->id)) throw new Exception('Could not create Card. Info provided does not have an ID.');
+        if (gettype($cardInfo) == 'string') {
+            $card = json_decode($cardInfo);
+        } else {
+            $card = $cardInfo;
+        }
 
-        // Save the raw query
-        $this->rawQuery = $cardInfo;
+        if (empty($card->id)) throw new Exception('Could not create Card. Info provided does not have an ID.');
 
         // Save each of the fields to this card
         $this->id = $card->id;

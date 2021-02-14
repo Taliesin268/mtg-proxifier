@@ -317,9 +317,9 @@ export default class Card {
             if (symbol2 == null) {
                 return Card.convertSingleManaSymbol(symbol1);
             } else if (symbol2 == 'P') {
-                return Card.convertSingleManaSymbol(symbol2, true, true);
-            } else if (symbol1 == 'P') {
                 return Card.convertSingleManaSymbol(symbol1, true, true);
+            } else if (symbol1 == 'P') {
+                return Card.convertSingleManaSymbol(symbol2, true, true);
             } else {
                 return '<div class="mi-split">'
                     + Card.convertSingleManaSymbol(symbol1, true)
@@ -474,5 +474,13 @@ export default class Card {
         }
 
         return imageDiv;
+    }
+
+    /**
+     * Destroys this card.
+     */
+    public deconstruct(): void
+    {
+        this.elements.card.remove();
     }
 }

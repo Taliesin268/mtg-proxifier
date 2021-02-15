@@ -13,6 +13,8 @@ class Scry
     /** @var string[] Available search terms and their prefix. In the format 'name' => 'prefix'. */
     public const SEARCH_TERMS = ['name' => ''];
 
+    public const CHUNK_SIZE = 75;
+
     /**
      * Looks up a card based on a collection of search queries.
      *
@@ -149,21 +151,42 @@ class Scry
             return [];
         }
 
-        // Set the parameters array
-        $parameters = [];
-        foreach ($names as $id => $name) {
-            $parameters['identifiers'][$id] = ['name' => $name];
+        // Break the array into chunks
+        $chunks = array_chunk($names, self::CHUNK_SIZE);
+
+        // Initialise the output
+        $output = ['notFound' => [], 'found' => []];
+
+        // Iterate through each chunk
+        foreach ($chunks as $chunkIndex => $chunk) {
+            // Set the parameters array
+            $parameters = [];
+            foreach ($chunk as $id => $name) {
+                $parameters['identifiers'][$id] = ['name' => $name];
+            }
+
+            // Get the list of found cards
+            $foundCardsJson = self::performRequest(self::ENDPOINTS['Collection'], $parameters, 'POST', 'json');
+            $foundCards = json_decode($foundCardsJson);
+
+            // Merge the results into the output
+            $processed = self::processCardList($foundCards, $chunk);
+            $output = array_merge_recursive($output, $processed);
         }
 
-        // Get the list of found cards
-        $foundCardsJson = self::performRequest(self::ENDPOINTS['Collection'], $parameters, 'POST', 'json');
-        $foundCards = json_decode($foundCardsJson);
+        return $output;
+    }
 
+    private static function processCardList($foundCards, array $names): array
+    {
+        // Create the not found array
         if (empty($foundCards->not_found)) {
             $notFound = [];
         } else {
             $notFound = array_column($foundCards->not_found, 'name');
         }
+
+        // Init the found array
         $found = [];
 
         // Initialise the offset (for use in determining the position of a card)
@@ -177,7 +200,9 @@ class Scry
             }
 
             // Create a new card at this offset
-            $found[$name] = new Card($foundCards->data[$id - $offset]);
+            if (isset($foundCards->data)) {
+                $found[$name] = new Card($foundCards->data[$id - $offset]);
+            }
         }
 
         // Return the found and not found arrays

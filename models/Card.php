@@ -89,7 +89,7 @@ class Card implements JsonSerializable
         // Save each of the fields to this card
         $this->id = $card->id;
         $this->name = $card->name;
-        $this->manaCost = $card->mana_cost;
+        $this->manaCost = $card->mana_cost ?? '';
         $this->type = $card->type_line;
         $this->text = $card->oracle_text ?? '';
         $this->power = $card->power ?? null;
